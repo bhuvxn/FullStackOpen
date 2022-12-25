@@ -1,15 +1,14 @@
 import axios from 'axios';
 import {useState, useEffect} from 'react';
+import Weather from './components/Weather';
 function App() {
   const [countries, setCountries] = useState([])
   const [filter, setFilter] = useState('')
   const [Show, setShow] = useState([]);
   useEffect(()=>{
-    console.log('effect')
     axios
     .get('https://restcountries.com/v3.1/all')
     .then(response => {
-      console.log('promise fulfilled')
       setCountries(response.data)
     })
   }, [])
@@ -29,6 +28,8 @@ function App() {
     }
     setShow(current => [...current, value]);
   }
+
+
   
 
   return (
@@ -48,6 +49,8 @@ function App() {
         </ul>
 
         <img src={countries.flags.png} alt="flag" width="200" height="100"></img>
+        <Weather capital={countries.capital}/>
+        
       </div>}
       
        </li>)}

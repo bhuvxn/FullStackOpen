@@ -5,6 +5,7 @@ const Filter = ({persons}) => {
     const handleFilterChange = (event) => {
         console.log(event.target.value)
         setFilter(event.target.value)
+
       }
     persons = filter === '' ? persons : persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()))
    return (

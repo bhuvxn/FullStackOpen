@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import Note from './components/Note'
 import axios from 'axios'
+import noteService from './services/notes'
 const App = () => {
+  const headers = {
+    'Content-Type': 'text/plain'
+};
   const [notes, setNotes]= useState([])
   const [newNote, setNewNote] = useState(
     'a new note..'
@@ -9,13 +13,12 @@ const App = () => {
 
   const [showAll, setShowAll] = useState(true)
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log('effect')
-    axios
-    .get('http://localhost:3001/notes')
-    .then(response => {
-      console.log('promise fulfilled')
-      setNotes(response.data)
+    noteService
+    .getAll()
+    .then(initialNotes => {
+      setNotes(initialNotes)
     })
   }, [])
   console.log('render', notes.length, 'notes')
@@ -30,8 +33,12 @@ const App = () => {
       important: Math.random() <0.5,
       id: notes.length + 1,
     }
-    setNotes(notes.concat(noteObject))
-    setNewNote('')
+    axios.post('http://localhost:3001/notes', noteObject)
+    .then(response => {
+      console.log(response)
+    }).catch(error => {
+      console.log()
+    })
   }
   const notesToShow = showAll
   ?notes
@@ -40,6 +47,21 @@ const App = () => {
     console.log(event.target.value)
     setNewNote(event.target.value)
   }
+
+
+
+
+
+  const toggleImportanceOf = id => {
+    const url = 'http://localhost:3001/notes/${id}'
+    const note = notes.find(n => n.id === id)
+    const changedNote = {...note, important: !note.important}
+    axios.put(url, changedNote, {mode: "cors"}
+      ).then(response => {
+        setNotes(notes.map(note => note.id !== id ? note : response.data))
+      })
+  }
+
 
   return (
     <div>
@@ -53,7 +75,9 @@ const App = () => {
 
       <ul>
         {notesToShow.map(note => 
-          <Note key={note.id} note={note} />
+          <Note key={note.id} note={note} 
+          toggleImportance={()=>toggleImportanceOf(note.id)}
+          />
         )}
       </ul>
       <form onSubmit={addNote}>

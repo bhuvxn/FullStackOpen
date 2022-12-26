@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
+import axios from 'axios'
 const Form = ({persons}, {setPersons}) => {
    
     
@@ -15,34 +16,48 @@ const Form = ({persons}, {setPersons}) => {
       }
     const [newName, setNewName] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
-    const addName = (event) => {
-        event.preventDefault()
-        /*..check if name already exists in list and send alert.*/
-    
-        for (var i = 0; i < persons.length; i++) { console.log(persons[i].name) 
-          if (persons[i].name === newName) {
-            alert(`${newName} is already added to phonebook`)
-            return
-          }
-        }
-    
-    
-        console.log(event.target.value)
-        const nameObject = {
-          name: newName,
-          number: phoneNumber,
-          id: persons.length + 1,
-        }
-        console.log(nameObject)
-        setNewName('')
-        setPersons(persons.concat(nameObject))
+
+    const addName = (event) =>{
+      event.preventDefault()
+      console.log('buttonclicked', event.target )
+      if (persons.some(person => person.name === newName)) {
+       if(window.confirm (`${newName} is already added to phonebook, replace the old number with a new one?`)){
+
+        const person = persons.find(person => person.name === newName)
+        const changedPerson = {...person, number: phoneNumber}
+        axios.put(`http://localhost:3001/persons/${person.id}`, changedPerson)
+        .then(response => {
+          console.log("person updated")
+          setPersons(persons.map(person => person.id !== changedPerson.id ? person : changedPerson))
+        }).catch(error => {
+          console.log()
+        })
+
+
+        
+       }
       }
+      else {
+      const personObject = {
+        name: newName,
+        number: phoneNumber,
+        id: persons.length + 1,
+      }
+      axios.post('http://localhost:3001/persons', personObject)
+      .then(response => {
+        console.log("person posted")
+        setPersons(persons.concat(personObject))
+      }).catch(error => {
+        console.log()
+      })
+    }
+  }
   return (
     <form onSubmit={addName}>
         <div>
           name: <input value={newName} onChange={handleNameChange} />
         </div>
-        <div>number:  <input value = {phoneNumber} onChange = {handlePhoneNumberChange}/></div>
+        <div>number: <input value = {phoneNumber} onChange = {handlePhoneNumberChange}/></div>
 
       
         <div>

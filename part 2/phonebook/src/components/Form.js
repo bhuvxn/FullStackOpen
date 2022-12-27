@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import axios from 'axios'
+import Notification from './Notification'
 const Form = ({persons}, {setPersons}) => {
    
     
@@ -16,6 +17,9 @@ const Form = ({persons}, {setPersons}) => {
       }
     const [newName, setNewName] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
+
+    const [state, setState] = useState(null)
+
 
     const addName = (event) =>{
       event.preventDefault()
@@ -43,9 +47,14 @@ const Form = ({persons}, {setPersons}) => {
         number: phoneNumber,
         id: persons.length + 1,
       }
+      
+
       axios.post('http://localhost:3001/persons', personObject)
       .then(response => {
-        console.log("person posted")
+        setState('Phone number added successfully')
+        setTimeout(() => {
+          setState(null)
+        }, 5000)
         setPersons(persons.concat(personObject))
       }).catch(error => {
         console.log()
@@ -62,6 +71,7 @@ const Form = ({persons}, {setPersons}) => {
       
         <div>
           <button type="submit">add</button>
+          <Notification message={state} />
         </div>
       </form>
   )

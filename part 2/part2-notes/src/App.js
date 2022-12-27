@@ -1,92 +1,95 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+import './index.css'
 import Note from './components/Note'
-import axios from 'axios'
+import Notification from './components/Notification'
 import noteService from './services/notes'
+import Footer from './components/Footer'
 const App = () => {
-  const headers = {
-    'Content-Type': 'text/plain'
-};
-  const [notes, setNotes]= useState([])
-  const [newNote, setNewNote] = useState(
-    'a new note..'
-  ) 
-
+  const [notes, setNotes] = useState([])
+  const [newNote, setNewNote] = useState('')
   const [showAll, setShowAll] = useState(true)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
-    console.log('effect')
     noteService
-    .getAll()
-    .then(initialNotes => {
-      setNotes(initialNotes)
-    })
+      .getAll()
+      .then(initialNotes => {
+        setNotes(initialNotes)
+      })
   }, [])
-  console.log('render', notes.length, 'notes')
 
-
-  const addNote = (event) =>{
+  const addNote = (event) => {
     event.preventDefault()
-    console.log('buttonclicked', event.target )
     const noteObject = {
-      content:newNote,
+      content: newNote,
       date: new Date().toISOString(),
-      important: Math.random() <0.5,
+      important: Math.random() > 0.5,
       id: notes.length + 1,
     }
-    axios.post('http://localhost:3001/notes', noteObject)
-    .then(response => {
-      console.log(response)
-    }).catch(error => {
-      console.log()
-    })
-  }
-  const notesToShow = showAll
-  ?notes
-  :notes.filter(note=> note.important===true)
-  const handleNoteChange =(event)=>{
-    console.log(event.target.value)
-    setNewNote(event.target.value)
-  }
 
-
-
-
-
-  const toggleImportanceOf = id => {
-    const url = 'http://localhost:3001/notes/${id}'
-    const note = notes.find(n => n.id === id)
-    const changedNote = {...note, important: !note.important}
-    axios.put(url, changedNote, {mode: "cors"}
-      ).then(response => {
-        setNotes(notes.map(note => note.id !== id ? note : response.data))
+    noteService
+      .create(noteObject)
+      .then(returnedNote => {
+        setNotes(notes.concat(returnedNote))
+        setNewNote('')
       })
   }
 
+  const handleNoteChange = (event) => {
+    setNewNote(event.target.value)
+  }
+
+  const toggleImportanceOf = id => {
+    const note = notes.find(n => n.id === id)
+    const changedNote = { ...note, important: !note.important }
+  
+    noteService
+      .update(id, changedNote)
+      .then(returnedNote => {
+        setNotes(notes.map(note => note.id !== id ? note : returnedNote))
+      })
+      .catch(error => {
+        setErrorMessage(
+          `Note '${note.content}' was already removed from server`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        setNotes(notes.filter(n => n.id !== id))
+      })
+  }
+
+  const notesToShow = showAll
+    ? notes
+    : notes.filter(note => note.important)
 
   return (
     <div>
       <h1>Notes</h1>
-      <div> 
-        <button onClick={()=>setShowAll(!showAll)}>
-          show {showAll ? 'important':'all'}
+      <Notification message={errorMessage} />
+      <div>
+        <button onClick={() => setShowAll(!showAll)}>
+          show {showAll ? 'important' : 'all' }
         </button>
-      </div>
-
-
+      </div>   
       <ul>
         {notesToShow.map(note => 
-          <Note key={note.id} note={note} 
-          toggleImportance={()=>toggleImportanceOf(note.id)}
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={() => toggleImportanceOf(note.id)}
           />
         )}
       </ul>
       <form onSubmit={addNote}>
-        <input value = {newNote}
-        onChange = {handleNoteChange}
+        <input
+          value={newNote}
+          onChange={handleNoteChange}
         />
-        <button type = "submit">save</button>
+        <button type="submit">save</button>
       </form>
-    </div>  
+      <Footer />
+    </div>
   )
 }
 

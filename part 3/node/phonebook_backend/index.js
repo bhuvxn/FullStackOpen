@@ -4,6 +4,23 @@ const app = express(); // create express app
 app.use(cors()); // use cors
 app.use(express.json()) //this is why ur post wasnt working u forgot to add this
 
+
+
+var morgan = require('morgan')
+morgan.token('type', function (req, res) { return JSON.stringify(req.body) })
+app.use(morgan(function (tokens, req, res) {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content'), '-',
+    tokens['response-time'](req, res), 'ms',
+    tokens['type'](req, res)
+  ].join(' ')
+}))
+
+
+
 let phonebook = [
     { 
       "id": 1,
@@ -31,11 +48,14 @@ app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
 
 
-app.get('/', (request,response)=>{
+
+app.get('/', (request,response)=>
+  {
     response.json(phonebook)
 })
 
 app.get('/info', (request,response)=>{
+
     response.send(`<p>Phonebook has info for ${phonebook.length} people</p>, <p>${new Date()}</p>`)
    
 })

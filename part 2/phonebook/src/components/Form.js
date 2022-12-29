@@ -4,8 +4,7 @@ import axios from 'axios'
 import Notification from './Notification'
 const Form = ({persons}, {setPersons}) => {
    
-    
-
+  
     const handleNameChange = (event) => {
         console.log(event.target.value)
         setNewName(event.target.value)
@@ -29,7 +28,7 @@ const Form = ({persons}, {setPersons}) => {
 
         const person = persons.find(person => person.name === newName)
         const changedPerson = {...person, number: phoneNumber}
-        axios.put(`http://localhost:3001/persons/${person.id}`, changedPerson)
+        axios.put(`/persons/${person.id}`, changedPerson)
         .then(response => {
           console.log("person updated")
           setPersons(persons.map(person => person.id !== changedPerson.id ? person : changedPerson))
@@ -49,7 +48,7 @@ const Form = ({persons}, {setPersons}) => {
       }
       
 
-      axios.post('http://localhost:3001/persons', personObject)
+      axios.post('/api/persons', personObject)
       .then(response => {
         setState('Phone number added successfully')
         setTimeout(() => {

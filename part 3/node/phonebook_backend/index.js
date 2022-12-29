@@ -3,22 +3,7 @@ cors = require('cors'); // import cors
 const app = express(); // create express app
 app.use(cors()); // use cors
 app.use(express.json()) //this is why ur post wasnt working u forgot to add this
-
-
-
-var morgan = require('morgan')
-morgan.token('type', function (req, res) { return JSON.stringify(req.body) })
-app.use(morgan(function (tokens, req, res) {
-  return [
-    tokens.method(req, res),
-    tokens.url(req, res),
-    tokens.status(req, res),
-    tokens.res(req, res, 'content'), '-',
-    tokens['response-time'](req, res), 'ms',
-    tokens['type'](req, res)
-  ].join(' ')
-}))
-
+app.use(express.static('build')) //this is why ur post wasnt working u forgot to add this
 
 
 let phonebook = [
@@ -43,13 +28,13 @@ let phonebook = [
       "number": "39-23-6423122"
     }
 ]
-const PORT = 3002.
+const PORT = process.env.PORT || 3002
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
 
 
 
-app.get('/', (request,response)=>
+app.get('/api/persons', (request,response)=>
   {
     response.json(phonebook)
 })
@@ -72,7 +57,7 @@ app.get('/api/persons/:id', (request,response)=>{
     }
   })
 //route to delete a person from the phonebook
-app.delete('/api/persons/:id', (request,response)=>{
+app.delete(':id', (request,response)=>{
     const id = Number(request.params.id)
     phonebook = phonebook.filter(person=>person.id !== id)
     if (phonebook){

@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
             type:mongoose.Schema.Types.ObjectID,
             ref: 'Blog'
         }
-    ],
+    ],  
 })
 
 
@@ -22,6 +22,6 @@ userSchema.set('toJSON', {
       delete returnedObject.passwordHash
     }
   })
-const User = mongoose.nodel('User', userSchema)
+const User = mongoose.model('User', userSchema)
 
 module.exports = User

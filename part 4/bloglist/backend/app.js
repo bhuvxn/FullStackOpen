@@ -2,10 +2,13 @@ express = require("express")
 const config = require('./utils/config')
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const logger = require('./utils/logger')
+
+const middleware = require('./utils/middleware')
 mongoose.set("strictQuery", false);
 
 logger.info('connecting to', config.MONGODB_URI)
@@ -22,6 +25,8 @@ mongoose
     console.log("error connecting to MongoDB:", error.message);
   });
 
+app.use(middleware.tokenExtractor)
+app.use(middleware.tokenValidator)
 
 
 app.use(cors());
@@ -32,4 +37,5 @@ app.use(express.static('build'))
 
 app.use('/api/blog', blogsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 module.exports = app 

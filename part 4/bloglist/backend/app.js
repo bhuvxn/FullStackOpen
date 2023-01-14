@@ -1,5 +1,6 @@
 express = require("express")
 const config = require('./utils/config')
+
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
@@ -28,7 +29,7 @@ mongoose
 
 
 app.use(cors());
-
+app.use(middleware.corsMiddleware)
 app.use(express.json());
 
 app.use(express.static('build'))

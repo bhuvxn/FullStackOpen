@@ -1,7 +1,12 @@
 const { RepeatOneSharp } = require('@material-ui/icons')
 const logger = require('./logger')
 
-
+var corsMiddleware = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); //replace localhost with actual host
+    res.header('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, PATCH, POST, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Authorization');
+    next();
+}
 const requestLogger=(request,response,next)=>{
     logger.info('Method:', request.method)
     logger.info('Path: ', request.path)
@@ -49,6 +54,7 @@ const tokenValidator = (request, response, next) => {
 
 
 module.exports = {
+    corsMiddleware,
     requestLogger,
     unknownEndpoint,
     errorHandler,

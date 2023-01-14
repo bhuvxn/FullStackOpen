@@ -1,8 +1,7 @@
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
-
-
+const cors = require('cors')
 usersRouter.post('/', async (request, response)  =>{
     const {username, name, password} = request.body 
     const saltRounds = 10

@@ -17,7 +17,6 @@ const exerciseCalculator=(exercises: Array<number>, target:number): exerciseRes 
         avg+= exercises[i]
 
     }
-    const success = false; 
     let rating = 2; 
     //compute avg
     avg = avg/Total_days
@@ -38,4 +37,3 @@ const exerciseCalculator=(exercises: Array<number>, target:number): exerciseRes 
 
     
 }
-console.log(exerciseCalculator([3, 0, 2, 4.5, 0, 3, 1], 2))

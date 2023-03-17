@@ -37,3 +37,4 @@ const exerciseCalculator=(exercises: Array<number>, target:number): exerciseRes 
 
     
 }
+export default exerciseCalculator

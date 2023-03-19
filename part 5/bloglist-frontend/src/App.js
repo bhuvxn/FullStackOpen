@@ -1,0 +1,126 @@
+import { useState, useEffect } from 'react'
+import Blog from './components/Blog'
+import blogService from './services/blogs'
+import loginService from './services/login'
+const App = () => {
+  const [blogs, setBlogs] = useState([])
+  const [Message, setMessage] = useState(null) 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
+  useEffect(() => {
+    blogService.getAll().then(blogs =>
+      setBlogs( blogs )
+    )  
+  }, [])
+  const handleLogin = async (event)=>{
+    event.preventDefault()
+    try{
+      
+      const user = await loginService.login({
+        username, password
+      })
+
+      setUser(user)
+      setUsername('')
+      setPassword('')
+      if(user){
+        setMessage('logged in successfully')
+        setTimeout(()=>{
+          setMessage(null)
+        }, 5000)
+      }
+    } catch(error){
+      console.log('cant login')
+      console.log(error)
+      if (user===null){
+        setMessage('wrong credentials')
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      }
+    }
+  
+  }
+  const Notification = ({message}) =>{
+
+    if (message === null) {
+      return null
+    }
+    return (
+      <div className="error">
+        {message}
+      </div>
+    )
+
+  }
+
+  const loginForm = () => (
+    
+    <div>Login
+    <form onSubmit={handleLogin}>
+        <div>
+            username
+            <input
+            type="text"
+            value={username}
+            name="Username"
+            onChange={({ target }) => setUsername(target.value)}
+            />
+        </div>
+        <div>
+            password
+            <input
+            type="password"
+            value={password}
+            name="Password"
+            onChange={({ target }) => setPassword(target.value)}
+            />
+        </div>
+        <button type="submit">login</button>
+    </form>
+    </div>
+  )
+  const loggedin = ()=>{
+    return(
+      <div>
+        <h1>{user.username} logged in</h1>
+      </div>
+    )
+  }
+
+  const blogforms = ()=>{
+    return (
+      <form>
+      <div>
+        title:
+        <input type = "text" /> 
+      </div>
+      <div> 
+       author:
+       <input type = "text"/>
+      </div>
+      <div> 
+        url: 
+        <input type = "text"/>
+      </div>
+      <button>post blog</button>
+      </form>
+    )
+  }
+  return (
+    <div>
+      <Notification message={Message}/>
+      <h2>blogs</h2>
+      {user === null && loginForm()}, 
+      {user !==null && loggedin()},
+      {user !==null && blogforms()}
+      { 
+      blogs.map(blog =>
+        <Blog key={blog.id} blog={blog} />
+      )}
+    </div>
+  )
+}
+
+export default App

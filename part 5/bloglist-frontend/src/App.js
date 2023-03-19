@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Login from './components/Login'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [Message, setMessage] = useState(null) 
@@ -13,6 +14,7 @@ const App = () => {
       setBlogs( blogs )
     )  
   }, [])
+  const [LoginVisible, setLoginVisible] = useState(false)
   const handleLogin = async (event)=>{
     event.preventDefault()
     try{
@@ -55,32 +57,30 @@ const App = () => {
 
   }
 
-  const loginForm = () => (
-    
-    <div>Login
-    <form onSubmit={handleLogin}>
-        <div>
-            username
-            <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-            />
-        </div>
-        <div>
-            password
-            <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-            />
-        </div>
-        <button type="submit">login</button>
-    </form>
+  const loginForm = () => {
+
+    const hideWhenVisible = { display: LoginVisible ? 'none' : '' }
+    const showWhenVisible = { display: LoginVisible ? '' : 'none' }
+    return(
+    <div>
+    <div style = {hideWhenVisible}>
+      <button onClick = {()=> setLoginVisible(true)}>login </button>
+    </div>
+    <div style ={showWhenVisible}>Login
+
+        <Login
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        />        
+        <button onClick={() => setLoginVisible(false)}>cancel</button>
+  
+    </div>
     </div>
   )
+  }
   const loggedin = ()=>{
     return(
       <div>
